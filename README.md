@@ -229,7 +229,7 @@ skuの項目を「Standard_GRS」に変更しました。
       "name": "[parameters('StorageName')]",
       "location": "[parameters('Location')]",
       "sku": {
-        "name": "[parameters('SKUName')]"
+        "name": "[parameters('StorageSKU')]"
       },
       "kind": "StorageV2",
       "properties": {
