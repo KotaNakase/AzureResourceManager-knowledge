@@ -183,5 +183,76 @@ skuの項目を「Standard_GRS」に変更しました。
 
 デプロイ後にちゃんと冗長性の項目が更新されていることが確認できました。同じ名前のリソースでテンプレートファイルを実行すると、新たにリソースが生成されることはなく、リソース情報が更新されるようです。
 
+## パラメータファイルを用いたデプロイの実施
 
+これまで、デプロイの実施にあたって動的に変更したい値についてはパラメータを手入力で実行時に指定していましたが、この入力内容も、パラメータファイルとして管理することができ、デプロイ時に参照することでこれまで同様のデプロイが実現できます。
 
+まずは以下のパラメータファイルを作成します。SKUとLocationをパラメータファイルで指定することができます。
+
+```
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "StorageSKU": {
+          "value": "Standard_LRS"
+      },
+      "Location": {
+          "value": "japaneast"
+      }
+  }
+}
+```
+
+テンプレートファイルも以下の様に、パラメータを受け付けられるように一部変更しました。
+```
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "StorageName": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 24
+    },
+    "Location": {
+        "type": "string"
+    },
+    "StorageSKU": {
+        "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-09-01",
+      "name": "[parameters('StorageName')]",
+      "location": "[parameters('Location')]",
+      "sku": {
+        "name": "[parameters('SKUName')]"
+      },
+      "kind": "StorageV2",
+      "properties": {
+          "supportsHttpsTrafficOnly": true
+      }
+    }
+  ]
+}
+```
+
+後はコマンド実行時にどのテンプレートファイルを使用するか指定するだけです。
+
+```
+$templatefile = "./clouddrive/template04.json"
+$RG = "armtemplatetest"
+$parameterfile = "parametersfile.json"
+New-AzResourceGroupDeployment -ResourceGroupName $RG -TemplateFile $templatefile -StorageName "nakasetestjpeast03" -TemplateParameterFile $parameterfile
+```
+
+![Update02](/img/stgaccount02.png)
+
+デプロイの「入力」からパラメータの情報を確認してみると、ちゃんと3つのパラメータがファイルから参照できていることがわかりました。
+
+![Input02](/img/input02.png)
+
+テンプレートファイルとパラメータファイルを使いこなせば、コンテナイメージの様にAzure上の資材をコード化でき、環境差異をなくすことができそうです。再現が複雑なリソースの作成については、このARMテンプレートが実用的に感じました。
