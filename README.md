@@ -36,7 +36,7 @@ New-AzResourceGroupDeployment -ResourceGroupName $RG -TemplateFile $templatefile
 
 デプロイの結果をPortal上で確認するには、リソースグループ > デプロイから確認することができます。
 
-![Log01](/img/log01.png)
+![Log01](/img/Log01.png)
 
 今回はテンプレートファイル内の「resources」を空欄で実行したため、何も生成しないテンプレートを実行したということになります。
 
@@ -55,8 +55,6 @@ ARMテンプレートを使用した動作確認は完了したので、実際�
 ![ResourceTemplate](/img/resourcetemplate.png)
 
 フォルダ内のazuredeploy.jsonにリソースを作成するためのテンプレートが記載されているので、これを参考にARMテンプレートを作成します。
-
-![AzureDeploy](/img/azuredeploy.png)
 
 ![AzureDeploy](/img/azuredeploy.png)
 
